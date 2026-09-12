@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> SORPRESA MAILOV - HAPPYBIRTHDAY </title>
+</head>
+<body>
+    <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #fde8f0 0%, #f7d6e0 100%);
+      height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      position: relative;
+    }
+
+    .bts-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bts-logo {
+      position: absolute;
+      opacity: 0.28;
+      animation: float 14s infinite ease-in-out;
+    }
+
+    .bts-symbol {
+      display: flex;
+      gap: 6px;
+      transform: scale(1.5);
+    }
+
+    .bts-door {
+      width: 22px;
+      height: 52px;
+      background-color: #a82e67;
+    }
+
+    .bts-door.left {
+      clip-path: polygon(0 0, 100% 12%, 100% 88%, 0 100%);
+    }
+
+    .bts-door.right {
+      clip-path: polygon(0 12%, 100% 0, 100% 100%, 0 88%);
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(105vh) rotate(0deg);
+      }
+      50% {
+        transform: translateY(50vh) rotate(15deg);
+      }
+      100% {
+        transform: translateY(-15vh) rotate(-15deg);
+      }
+    }
+
+    h1 {
+      margin-top: 15vh; /* Se redujo el margen superior para compensar la subida del ramo */
+      font-size: 5.5rem; 
+      color: #9d245b;
+      text-shadow: 0 0 15px rgba(255, 182, 193, 0.9), 0 0 30px rgba(199, 21, 133, 0.4);
+      font-family: 'Brush Script MT', cursive, sans-serif;
+      z-index: 10;
+      position: relative;
+      animation: pulse 2s infinite alternate ease-in-out;
+      letter-spacing: 3px;
+      user-select: none;
+      text-align: center;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        text-shadow: 0 0 15px rgba(255, 182, 193, 0.9), 0 0 25px rgba(199, 21, 133, 0.4);
+      }
+      100% {
+        transform: scale(1.06);
+        text-shadow: 0 0 20px rgba(219, 112, 147, 1), 0 0 40px rgba(199, 21, 133, 0.6);
+      }
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bts-bg" id="btsContainer"></div>
+
+  <h1>Happy Birthday</h1>
+  <canvas id="bouquetCanvas"></canvas>
+
+  <script>
+    const btsContainer = document.getElementById('btsContainer');
+    const logoCount = 18;
+
+    for (let i = 0; i < logoCount; i++) {
+      const logoWrapper = document.createElement('div');
+      logoWrapper.className = 'bts-logo';
+      
+      const symbol = document.createElement('div');
+      symbol.className = 'bts-symbol';
+
+      const doorLeft = document.createElement('div');
+      doorLeft.className = 'bts-door left';
+
+      const doorRight = document.createElement('div');
+      doorRight.className = 'bts-door right';
+
+      symbol.appendChild(doorLeft);
+      symbol.appendChild(doorRight);
+      logoWrapper.appendChild(symbol);
+
+      logoWrapper.style.left = `${Math.random() * 90}%`;
+      logoWrapper.style.animationDuration = `${9 + Math.random() * 8}s`;
+      logoWrapper.style.animationDelay = `${Math.random() * 8}s`;
+
+      btsContainer.appendChild(logoWrapper);
+    }
+
+    const canvas = document.getElementById('bouquetCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      const scale = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * scale;
+      canvas.height = window.innerHeight * scale;
+      ctx.scale(scale, scale);
+      
+      drawBouquet();
+    }
+
+    function drawStem(startX, startY, endX, endY) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.quadraticCurveTo((startX + endX) / 2 + (startX < endX ? -20 : 20), (startY + endY) / 2, endX, endY);
+      ctx.strokeStyle = '#234a27';
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.quadraticCurveTo((startX + endX) / 2 + (startX < endX ? -20 : 20), (startY + endY) / 2, endX, endY);
+      ctx.strokeStyle = '#4e8d54';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawLeaf(x, y, angle, length, width) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(width, -length / 2, 0, -length);
+      ctx.quadraticCurveTo(-width, -length / 2, 0, 0);
+
+      const grad = ctx.createLinearGradient(0, 0, 0, -length);
+      grad.addColorStop(0, '#1a3a1e');
+      grad.addColorStop(0.5, '#2a5a30');
+      grad.addColorStop(1, '#3d7845');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, -length * 0.9);
+      ctx.strokeStyle = '#5c9c65';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function drawPinkRose(cx, cy, radius, scaleProgress) {
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      const layers = 5;
+      const currentRadius = radius * scaleProgress;
+
+      for (let layer = layers; layer >= 1; layer--) {
+        const petalCount = layer * 4 + 2;
+        const layerRadius = (currentRadius / layers) * layer;
+        const angleStep = (Math.PI * 2) / petalCount;
+
+        for (let i = 0; i < petalCount; i++) {
+          const angle = i * angleStep + (layer * 0.3);
+          ctx.save();
+          ctx.rotate(angle);
+
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(layerRadius * 0.7, -layerRadius * 0.8, 0, -layerRadius);
+          ctx.quadraticCurveTo(-layerRadius * 0.7, -layerRadius * 0.8, 0, 0);
+
+          const grad = ctx.createRadialGradient(0, 0, 2, 0, -layerRadius * 0.5, layerRadius);
+          if (layer === 1) {
+            grad.addColorStop(0, '#ff4081');
+            grad.addColorStop(1, '#ff80ab');
+          } else if (layer % 2 === 0) {
+            grad.addColorStop(0, '#f50057');
+            grad.addColorStop(1, '#ff80ab');
+          } else {
+            grad.addColorStop(0, '#e91e63');
+            grad.addColorStop(1, '#f48fb1');
+          }
+
+          ctx.fillStyle = grad;
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = 'rgba(233, 30, 99, 0.35)';
+          ctx.fill();
+          
+          ctx.strokeStyle = '#c2185b';
+          ctx.lineWidth = 0.7;
+          ctx.stroke();
+
+          ctx.restore();
+        }
+      }
+
+      ctx.beginPath();
+      ctx.arc(0, 0, currentRadius * 0.15, 0, Math.PI * 2);
+      ctx.fillStyle = '#ad1457';
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawRedRose(cx, cy, radius, scaleProgress) {
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      const layers = 6;
+      const currentRadius = radius * scaleProgress;
+
+      for (let layer = layers; layer >= 1; layer--) {
+        const petalCount = layer * 3 + 2;
+        const layerRadius = (currentRadius / layers) * layer;
+        const angleStep = (Math.PI * 2) / petalCount;
+
+        for (let i = 0; i < petalCount; i++) {
+          const angle = i * angleStep + (layer * 0.4);
+          ctx.save();
+          ctx.rotate(angle);
+
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(layerRadius * 0.8, -layerRadius * 0.85, 0, -layerRadius);
+          ctx.quadraticCurveTo(-layerRadius * 0.8, -layerRadius * 0.85, 0, 0);
+
+          const grad = ctx.createRadialGradient(0, 0, 2, 0, -layerRadius * 0.5, layerRadius);
+          if (layer === 1) {
+            grad.addColorStop(0, '#800000');
+            grad.addColorStop(1, '#b30000');
+          } else if (layer % 2 === 0) {
+            grad.addColorStop(0, '#a70000');
+            grad.addColorStop(1, '#d90429');
+          } else {
+            grad.addColorStop(0, '#9d0208');
+            grad.addColorStop(1, '#ef233c');
+          }
+
+          ctx.fillStyle = grad;
+          ctx.shadowBlur = 7;
+          ctx.shadowColor = 'rgba(128, 0, 0, 0.35)';
+          ctx.fill();
+          
+          ctx.strokeStyle = '#5c0002';
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+
+          ctx.restore();
+        }
+      }
+
+      ctx.beginPath();
+      ctx.arc(0, 0, currentRadius * 0.12, 0, Math.PI * 2);
+      ctx.fillStyle = '#590004';
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawBud(x, y, angle, size) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+
+      for (let i = -1; i <= 1; i += 2) {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(i * size * 0.4, -size * 0.5, 0, -size * 0.9);
+        ctx.fillStyle = '#2a5a30';
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(size * 0.5, -size * 0.6, 0, -size);
+      ctx.quadraticCurveTo(-size * 0.5, -size * 0.6, 0, 0);
+      ctx.fillStyle = '#ff80ab';
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawBouquetWrapper(centerX, tieY) {
+      ctx.save();
+
+      ctx.beginPath();
+      ctx.moveTo(centerX - 280, tieY - 280);
+      ctx.quadraticCurveTo(centerX - 300, tieY - 90, centerX - 60, tieY + 90);
+      ctx.lineTo(centerX + 60, tieY + 90);
+      ctx.quadraticCurveTo(centerX + 300, tieY - 90, centerX + 280, tieY - 280);
+      ctx.quadraticCurveTo(centerX, tieY - 330, centerX - 280, tieY - 280);
+
+      const backPaperGrad = ctx.createLinearGradient(centerX - 180, tieY - 220, centerX + 180, tieY + 100);
+      backPaperGrad.addColorStop(0, '#fcae91');
+      backPaperGrad.addColorStop(0.5, '#ff8b6a');
+      backPaperGrad.addColorStop(1, '#f77353');
+      ctx.fillStyle = backPaperGrad;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(centerX - 250, tieY - 260);
+      ctx.quadraticCurveTo(centerX - 270, tieY - 80, centerX - 40, tieY + 70);
+      ctx.lineTo(centerX + 40, tieY + 70);
+      ctx.quadraticCurveTo(centerX + 270, tieY - 80, centerX + 250, tieY - 260);
+      ctx.quadraticCurveTo(centerX, tieY - 300, centerX - 250, tieY - 260);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+      ctx.fill();
+      ctx.strokeStyle = '#fcae91';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function drawWrapperFrontAndRibbon(centerX, tieY) {
+      ctx.save();
+
+      ctx.beginPath();
+      ctx.moveTo(centerX - 85, tieY + 30);
+      ctx.lineTo(centerX - 100, tieY + 125);
+      ctx.quadraticCurveTo(centerX, tieY + 160, centerX + 100, tieY + 130);
+      ctx.lineTo(centerX + 85, tieY + 30);
+      ctx.quadraticCurveTo(centerX, tieY + 50, centerX - 85, tieY + 30);
+
+      const frontPaperGrad = ctx.createLinearGradient(centerX - 90, tieY, centerX + 90, tieY + 130);
+      frontPaperGrad.addColorStop(0, '#ff9e80');
+      frontPaperGrad.addColorStop(1, '#fcae91');
+      ctx.fillStyle = frontPaperGrad;
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = 'rgba(0,0,0,0.15)';
+      ctx.fill();
+
+      const ribbonY = tieY + 42;
+
+      ctx.beginPath();
+      ctx.moveTo(centerX - 12, ribbonY);
+      ctx.quadraticCurveTo(centerX - 40, ribbonY + 75, centerX - 50, ribbonY + 140);
+      ctx.lineTo(centerX - 28, ribbonY + 145);
+      ctx.quadraticCurveTo(centerX - 18, ribbonY + 75, centerX - 2, ribbonY + 10);
+      ctx.fillStyle = '#f8bbd0';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(centerX + 12, ribbonY);
+      ctx.quadraticCurveTo(centerX + 40, ribbonY + 75, centerX + 50, ribbonY + 140);
+      ctx.lineTo(centerX + 28, ribbonY + 145);
+      ctx.quadraticCurveTo(centerX + 18, ribbonY + 75, centerX + 2, ribbonY + 10);
+      ctx.fillStyle = '#f48fb1';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(centerX - 40, ribbonY - 8, 38, 20, -Math.PI / 8, 0, Math.PI * 2);
+      ctx.fillStyle = '#f8bbd0';
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = 'rgba(0,0,0,0.12)';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(centerX + 40, ribbonY - 8, 38, 20, Math.PI / 8, 0, Math.PI * 2);
+      ctx.fillStyle = '#f48fb1';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(centerX, ribbonY - 5, 14, 0, Math.PI * 2);
+      ctx.fillStyle = '#f06292';
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    let progress = 0;
+
+    function drawBouquet() {
+      const scale = window.devicePixelRatio || 1;
+      const width = canvas.width / scale;
+      const height = canvas.height / scale;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const centerX = width / 2;
+      
+      /* Ajuste: Cambiado de 0.85 a 0.70 para elevar el ramo y centrarlo mejor */
+      const tieY = height * 0.70; 
+
+      drawBouquetWrapper(centerX, tieY);
+
+      const pinkRoses = [
+        { x: centerX, y: tieY - 250, r: 44 },
+        { x: centerX - 85, y: tieY - 190, r: 45 },
+        { x: centerX + 85, y: tieY - 190, r: 45 },
+        { x: centerX, y: tieY - 150, r: 48 },
+        { x: centerX - 85, y: tieY - 95, r: 46 },
+        { x: centerX + 85, y: tieY - 95, r: 46 },
+        { x: centerX, y: tieY - 60, r: 48 },
+        { x: centerX - 65, y: tieY, r: 42 },
+        { x: centerX + 65, y: tieY, r: 42 }
+      ];
+
+      const redRoses = [
+        { x: centerX - 180, y: tieY - 220, r: 44 },
+        { x: centerX - 190, y: tieY - 145, r: 46 },
+        { x: centerX - 180, y: tieY - 70, r: 46 },
+        { x: centerX - 155, y: tieY, r: 43 },
+
+        { x: centerX + 180, y: tieY - 220, r: 44 },
+        { x: centerX + 190, y: tieY - 145, r: 46 },
+        { x: centerX + 180, y: tieY - 70, r: 46 },
+        { x: centerX + 155, y: tieY, r: 43 }
+      ];
+
+      const allFlowers = [...pinkRoses, ...redRoses];
+
+      allFlowers.forEach(f => {
+        drawStem(f.x, f.y + 15, centerX, tieY + 40);
+      });
+
+      allFlowers.forEach(f => {
+        drawLeaf(f.x, f.y, -0.6, f.r * 1.25, f.r * 0.45);
+        drawLeaf(f.x, f.y, 0.6, f.r * 1.25, f.r * 0.45);
+      });
+
+      drawBud(centerX - 205, tieY - 170, -0.8, 28);
+      drawBud(centerX + 205, tieY - 170, 0.8, 28);
+      drawBud(centerX - 100, tieY - 280, -0.3, 26);
+      drawBud(centerX + 100, tieY - 280, 0.3, 26);
+
+      pinkRoses.forEach(f => {
+        drawPinkRose(f.x, f.y, f.r, Math.min(progress, 1));
+      });
+
+      redRoses.forEach(f => {
+        drawRedRose(f.x, f.y, f.r, Math.min(progress, 1));
+      });
+
+      drawWrapperFrontAndRibbon(centerX, tieY);
+
+      if (progress < 1) {
+        progress += 0.015;
+        requestAnimationFrame(drawBouquet);
+      }
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+  </script>
+</body>
+</html>
